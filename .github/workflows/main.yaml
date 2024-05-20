@@ -123,7 +123,7 @@ jobs:
 
   build_ledger_production:
     needs: configure
-    if: ${{ github.event_name == 'workflow_dispatch' }}
+    if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.run_build_ledger_production == 'true' }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -216,10 +216,10 @@ jobs:
       - name: Trigger Build Ledger Production
         run: |
           curl -X POST \
-            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            -H "Accept: application/vnd.github.v3+json" \
-            https://api.github.com/repos/${{ github.repository }}/actions/workflows/main.yml/dispatches \
-            -d '{"ref": "${{ github.event.workflow_run.head_branch }}"}'
+          -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+          -H "Accept: application/vnd.github.v3+json" \
+          https://api.github.com/repos/${{ github.repository }}/actions/workflows/main.yml/dispatches \
+          -d '{"ref": "${{ github.event.workflow_run.head_branch }}", "inputs": {"run_build_ledger_production": true}}'
 
   test_zemu:
     needs: [tests_zemu_setup]
