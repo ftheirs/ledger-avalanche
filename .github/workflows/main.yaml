@@ -123,6 +123,7 @@ jobs:
 
   build_ledger_production:
     needs: configure
+    if: ${{ github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -208,8 +209,20 @@ jobs:
           TESTS=`yarn test --listTests --json | head -n 3 | tail -n 1 | jq -cM 'to_entries | map({id: .key, file: .value})'`
           echo "tests=$TESTS" >> "$GITHUB_OUTPUT"
 
+  trigger_build_ledger_production:
+    if: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.job_name == 'tests_zemu_setup' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Build Ledger Production
+        run: |
+          curl -X POST \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/repos/${{ github.repository }}/actions/workflows/main.yml/dispatches \
+            -d '{"ref": "${{ github.event.workflow_run.head_branch }}"}'
+
   test_zemu:
-    needs: [build_ledger_production, tests_zemu_setup]
+    needs: [tests_zemu_setup]
     if: ${{! contains(toJSON(github.event.commits.*.message), '[skip-zemu]')}}
     runs-on: ubuntu-latest
     strategy:
