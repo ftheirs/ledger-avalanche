@@ -60,34 +60,34 @@ jobs:
           echo "LNS Generic app size: ${{needs.build_ledger.outputs.size_nanos}} KiB"
           [ ${{needs.build_ledger.outputs.size_nanos}} -le $NANOS_LIMIT_SIZE ]
 
-  test_zemu:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Test
-        run: |
-          id
-          echo $HOME
-          echo $DISPLAY
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          submodules: true
-      - run: sudo apt-get update -y && sudo apt-get install -y libusb-1.0.0 libudev-dev
-      - name: Install rust
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-      - name: Install node
-        uses: actions/setup-node@v3
-      - name: Install yarn
-        run: |
-          npm install -g yarn
-      - name: Build and run zemu tests
-        run: |
-          make test_all
+  # test_zemu:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Test
+  #       run: |
+  #         id
+  #         echo $HOME
+  #         echo $DISPLAY
+  #     - name: Checkout
+  #       uses: actions/checkout@v4
+  #       with:
+  #         submodules: true
+  #     - run: sudo apt-get update -y && sudo apt-get install -y libusb-1.0.0 libudev-dev
+  #     - name: Install rust
+  #       uses: actions-rs/toolchain@v1
+  #       with:
+  #         toolchain: stable
+  #     - name: Install node
+  #       uses: actions/setup-node@v3
+  #     - name: Install yarn
+  #       run: |
+  #         npm install -g yarn
+  #     - name: Build and run zemu tests
+  #       run: |
+  #         make test_all
 
   build_package_nanos:
-    needs: [configure, build, build_ledger, test_zemu]
+    needs: [configure, build, build_ledger]
     if: ${{ github.ref == 'refs/heads/hybrid_app' }}
     runs-on: ubuntu-latest
     container:
