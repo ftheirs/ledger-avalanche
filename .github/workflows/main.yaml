@@ -236,6 +236,7 @@ jobs:
           submodules: true
 
       - name: Download artifacts
+        if: ${{ success() && needs.build_ledger_production.result == 'success' }}
         uses: actions/download-artifact@v3
         with:
           path: /tmp/artifacts
