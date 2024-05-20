@@ -47,7 +47,7 @@ jobs:
         id: build_nanos
         shell: bash -l {0}
         run: |
-          make buildS
+          make
           echo "size_nanos=$(python3 deps/ledger-zxlib/scripts/getSize.py s)" >> $GITHUB_OUTPUT
 
   size_nano_s:
